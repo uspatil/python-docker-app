@@ -10,23 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Build Docker image
-      run: docker build -t python-app .
-
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          docker stop python-app || true
-          docker rm python-app || true
-          docker rmi python-app || true
-          docker run -d \
-            --name python-app \
-            -p 80:5000 \
-            python-app
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/python-app
+            git pull origin main
+            docker stop python-app || true
+            docker rm python-app || true
+            docker build -t python-app .
+            docker run -d \
+              --restart always \
+              --name python-app \
+              -p 80:5000 \
+              python-app
