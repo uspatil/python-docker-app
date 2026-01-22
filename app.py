@@ -7,7 +7,7 @@ def hello():
     return "🚀 Python App Deployed using Docker & GitHub Actions! is working now"
 
 @app.route("/test")
-def hello():
+def test():
     return "🚀 test route working fine"
 
 if __name__ == "__main__":
