@@ -6,5 +6,9 @@ app = Flask(__name__)
 def hello():
     return "🚀 Python App Deployed using Docker & GitHub Actions! is working now"
 
+@app.route("/test")
+def hello():
+    return "🚀 test route working fine"
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
