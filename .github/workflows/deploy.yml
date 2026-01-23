@@ -1,4 +1,4 @@
-name: Deploy Python App to EC2
+name: Deploy Full Stack App to EC2
 
 on:
   push:
@@ -24,30 +24,29 @@ jobs:
 
             echo "Connected to EC2"
 
+            # Go to project directory
+            cd /home/ubuntu/python-docker-app
+
             # Install Docker if missing
             if ! command -v docker >/dev/null 2>&1; then
-              sudo apt update -y || sudo yum update -y
-              sudo apt install docker.io -y || sudo yum install docker -y
+              sudo apt update -y
+              sudo apt install docker.io -y
               sudo systemctl start docker
-              sudo systemctl enable docker
-              sudo usermod -aG docker $USER
+              sudo usermod -aG docker ubuntu
             fi
 
-            APP_DIR=$HOME/python-app
-
-            if [ ! -d "$APP_DIR" ]; then
-              git clone https://github.com/uspatil/python-docker-app.git $APP_DIR
+            # Install Docker Compose if missing
+            if ! command -v docker-compose >/dev/null 2>&1; then
+              sudo apt install docker-compose -y
             fi
 
-            cd $APP_DIR
-            git pull origin main
+            echo "Stopping old containers"
+            docker-compose down
 
-            docker stop python-app || true
-            docker rm python-app || true
+            echo "Building images"
+            docker-compose build
 
-            docker build -t python-app .
-            docker run -d \
-              --restart always \
-              --name python-app \
-              -p 80:5000 \
-              python-app
+            echo "Starting containers"
+            docker-compose up -d
+
+            echo "Deployment successful 🚀"
