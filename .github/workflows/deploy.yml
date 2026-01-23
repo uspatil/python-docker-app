@@ -25,7 +25,7 @@ jobs:
             echo "Connected to EC2"
 
             # Go to project directory
-            cd /home/ubuntu/python-app
+            cd /home/ubuntu/python-docker-app
 
             # Install Docker if missing
             if ! command -v docker >/dev/null 2>&1; then
